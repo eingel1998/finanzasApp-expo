@@ -162,13 +162,13 @@ const styles = StyleSheet.create({
   },
   containerLight: {
     backgroundColor: Colors.background.light,
-    borderTopColor: Colors.border.light,
-    borderTopWidth: 1,
+    // borderTopColor: Colors.border.light, // Eliminado para quitar la línea gris
+    // borderTopWidth: 1, // Eliminado para quitar la línea gris
   },
   containerDark: {
     backgroundColor: Colors.background.dark,
-    borderTopColor: Colors.border.dark,
-    borderTopWidth: 1,
+    // borderTopColor: Colors.border.dark, // Eliminado para quitar la línea en modo oscuro
+    // borderTopWidth: 0, // Eliminado para quitar la línea en modo oscuro
   },
   indicator: {
     position: 'absolute',

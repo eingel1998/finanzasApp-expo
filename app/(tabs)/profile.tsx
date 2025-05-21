@@ -38,33 +38,37 @@ export default function ProfileScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <SettingsSection title="Cuenta">
-        {user ? (
-          <View style={styles.userContainer}>
-            {/* Placeholder para la imagen de perfil */}
-            <Image 
-              source={{ uri: user.avatar || 'https://via.placeholder.com/80' }} // Corregido a user.avatar
-              style={styles.profileImage} 
-            />
-            <View style={styles.userInfo}>
-              <ThemedText style={styles.userName}>{user.name}</ThemedText>
-              <ThemedText style={styles.userEmail}>{user.email}</ThemedText>
-            </View>
-            <Pressable onPress={logout} style={styles.button}>
-              <ThemedText style={styles.buttonText}>Cerrar Sesión</ThemedText>
-            </Pressable>
+      {/* <SettingsSection title="Cuenta"> */}
+      {/* Renderizamos el contenido de cuenta sin título ni sección extra */}
+      {user ? (
+        <View style={styles.userContainer}>
+          {/* Placeholder para la imagen de perfil */}
+          <Image 
+            source={{ uri: user.avatar || 'https://via.placeholder.com/80' }}
+            style={styles.profileImage} 
+          />
+          <View style={styles.userInfo}>
+            <ThemedText style={styles.userName}>{user.name}</ThemedText>
+            <ThemedText style={styles.userEmail}>{user.email}</ThemedText>
           </View>
-        ) : (
-          <View style={styles.authActions}>
-            <Pressable onPress={navigateToLogin} style={styles.button}>
-              <ThemedText style={styles.buttonText}>Iniciar Sesión</ThemedText>
-            </Pressable>
-            <Pressable onPress={navigateToRegister} style={[styles.button, styles.secondaryButton]}>
-              <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>Crear Cuenta</ThemedText>
-            </Pressable>
-          </View>
-        )}
-      </SettingsSection>
+          <Pressable onPress={async () => {
+            await logout();
+            router.replace('/(tabs)/profile');
+          }} style={styles.button}>
+            <ThemedText style={styles.buttonText}>Cerrar Sesión</ThemedText>
+          </Pressable>
+        </View>
+      ) : (
+        <View style={styles.authActions}>
+          <Pressable onPress={navigateToLogin} style={styles.button}>
+            <ThemedText style={styles.buttonText}>Iniciar Sesión</ThemedText>
+          </Pressable>
+          <Pressable onPress={navigateToRegister} style={[styles.button, styles.secondaryButton]}>
+            <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>Crear Cuenta</ThemedText>
+          </Pressable>
+        </View>
+      )}
+      {/* </SettingsSection> */}
 
       <SettingsSection title="Preferencias">
         <SettingsItem
@@ -106,6 +110,7 @@ const styles = StyleSheet.create({
   userContainer: {
     alignItems: 'center',
     marginBottom: Spacing.lg,
+    marginTop: Spacing.xxl,
   },
   profileImage: {
     width: 80,
@@ -130,6 +135,7 @@ const styles = StyleSheet.create({
   authActions: {
     alignItems: 'center',
     marginBottom: Spacing.lg,
+    marginTop: Spacing.xxl,
   },
   button: {
     backgroundColor: Colors.primary.light, // Ajustar según el tema

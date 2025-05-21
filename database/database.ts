@@ -1,8 +1,8 @@
- 
 import type { SQLiteDatabase } from 'expo-sqlite'; // Import type for clarity
 import * as SQLite from 'expo-sqlite';
 
 let dbInstance: SQLiteDatabase | null = null;
+let isInitializing = false;
 
 const getDbInstance = async (): Promise<SQLiteDatabase> => {
   if (!dbInstance) {
@@ -22,6 +22,11 @@ const getDbInstance = async (): Promise<SQLiteDatabase> => {
 };
 
 export const initDatabase = async () => {
+  if (isInitializing) {
+    // Si ya se está inicializando, no hacer nada
+    return;
+  }
+  isInitializing = true;
   try {
     const currentDb = await getDbInstance();
     await currentDb.withTransactionAsync(async () => {
@@ -46,9 +51,18 @@ export const initDatabase = async () => {
     });
     console.log('Database initialized successfully.');
   } catch (error) {
-    console.error('Error initializing database:', error);
-    // Depending on the application flow, you might want to re-throw or handle differently
-    throw error;
+    if (
+      String(error).includes('cannot start a transaction within a transaction') ||
+      String(error).includes('cannot rollback - no transaction is active')
+    ) {
+      // Error benigno por doble inicialización rápida, ignorar
+      console.warn('Database init: transacción ya activa o rollback innecesario, ignorado.');
+    } else {
+      console.error('Error initializing database:', error);
+      throw error;
+    }
+  } finally {
+    isInitializing = false;
   }
 };
 
