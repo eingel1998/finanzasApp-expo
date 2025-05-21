@@ -75,7 +75,7 @@ export function ModernTabBar({ state, descriptors, navigation }: ModernTabBarPro
           let iconName: IconSymbolName | '' = '';
           switch (route.name) {
             case 'index':
-              iconName = 'chart.pie.fill';
+              iconName = 'plus.circle.fill';
               break;
             case 'transactions':
               iconName = 'arrow.left.arrow.right';
@@ -88,6 +88,9 @@ export function ModernTabBar({ state, descriptors, navigation }: ModernTabBarPro
               break;
             case 'profile':
               iconName = 'person.fill';
+              break;
+            case 'dashboard':
+              iconName = 'chart.pie.fill';
               break;
             default:
               iconName = 'questionmark.circle';

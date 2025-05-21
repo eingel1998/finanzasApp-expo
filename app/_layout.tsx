@@ -2,25 +2,46 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react'; // Importar useState y useEffect
 import 'react-native-reanimated';
 
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { initDatabase } from '@/database/database';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useEffect } from 'react';
+
+// Componente interno que maneja la navegación basada en el estado de autenticación
+function RootLayoutNav() {
+  const { user, isLoading } = useAuth();
+  const colorScheme = useColorScheme();
+
+  if (isLoading) {
+    // Podríamos mostrar un indicador de carga aquí
+    return null;
+  }
+
+  return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Siempre mostramos las pestañas principales, pero el perfil manejará si el usuario está autenticado o no */}
+        <Stack.Screen name="(tabs)" />
+        {/* Ruta de autenticación accesible aunque el usuario no esté autenticado */}
+        <Stack.Screen name="auth" />
+        {/* Esta ruta es para manejar rutas no encontradas dentro del stack principal */}
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style="auto" />
+    </ThemeProvider>
+  );
+}
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  // Estado para controlar si el usuario está autenticado
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Inicialmente falso
-
-  // Efecto para simular la verificación de autenticación al cargar la app
+  // Inicializar la base de datos al cargar la aplicación
   useEffect(() => {
-    // TODO: Implementar lógica real para verificar si el usuario está autenticado
-    // Por ahora, simulamos que no está autenticado al inicio
-    setIsAuthenticated(false);
+    initDatabase();
   }, []);
 
   if (!loaded) {
@@ -29,19 +50,8 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
-          // Si está autenticado, mostrar las pestañas principales
-          <Stack.Screen name="(tabs)" />
-        ) : (
-          // Si no está autenticado, mostrar las rutas de autenticación
-          <Stack.Screen name="auth" />
-        )}
-        {/* Esta ruta es para manejar rutas no encontradas dentro del stack principal */}
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
   );
 }

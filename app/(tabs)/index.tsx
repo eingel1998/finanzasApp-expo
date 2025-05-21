@@ -4,30 +4,34 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { StyleSheet } from 'react-native';
 
-export default function DashboardScreen() {
+export default function AddTransactionScreen() {
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={<IconSymbol size={120} name="chart.pie.fill" color="#FFFFFF" style={styles.headerIcon} />}
+      headerBackgroundColor={{ light: '#C4E0B0', dark: '#2A4A2A' }}
+      headerImage={<IconSymbol size={120} name="plus.circle.fill" color="#FFFFFF" style={styles.headerIcon} />}
     >
       <ThemedView style={styles.container}>
-        <ThemedText type="title">Dashboard</ThemedText>
+        <ThemedText type="title">Añadir Transacción</ThemedText>
         
-        <ThemedView style={styles.summaryCard}>
-          <ThemedText type="subtitle">Resumen Financiero</ThemedText>
-          <ThemedText>Balance actual: $0.00</ThemedText>
-          <ThemedText>Ingresos del mes: $0.00</ThemedText>
-          <ThemedText>Gastos del mes: $0.00</ThemedText>
-        </ThemedView>
-
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle">Transacciones Recientes</ThemedText>
-          <ThemedText style={styles.emptyState}>No hay transacciones recientes</ThemedText>
-        </ThemedView>
-
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle">Distribución de Gastos</ThemedText>
-          <ThemedText style={styles.emptyState}>Añade transacciones para ver estadísticas</ThemedText>
+        <ThemedView style={styles.formContainer}>
+          <ThemedText type="subtitle">Nueva Transacción</ThemedText>
+          <ThemedText style={styles.formLabel}>Tipo de Transacción</ThemedText>
+          {/* Aquí irán los botones de tipo (ingreso/gasto) */}
+          
+          <ThemedText style={styles.formLabel}>Monto</ThemedText>
+          {/* Aquí irá el campo de monto */}
+          
+          <ThemedText style={styles.formLabel}>Categoría</ThemedText>
+          {/* Aquí irá el selector de categoría */}
+          
+          <ThemedText style={styles.formLabel}>Fecha</ThemedText>
+          {/* Aquí irá el selector de fecha */}
+          
+          <ThemedText style={styles.formLabel}>Descripción</ThemedText>
+          {/* Aquí irá el campo de descripción */}
+          
+          {/* Botón de guardar */}
+          <ThemedText style={styles.buttonPlaceholder}>Guardar Transacción</ThemedText>
         </ThemedView>
       </ThemedView>
     </ParallaxScrollView>
@@ -43,19 +47,24 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     alignSelf: 'center',
   },
-  summaryCard: {
+  formContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
     padding: 16,
     marginVertical: 16,
   },
-  section: {
-    marginVertical: 16,
+  formLabel: {
+    fontWeight: 'bold',
+    marginTop: 16,
+    marginBottom: 8,
   },
-  emptyState: {
-    fontStyle: 'italic',
-    opacity: 0.7,
-    marginTop: 8,
+  buttonPlaceholder: {
+    backgroundColor: 'rgba(10, 126, 164, 0.2)',
+    color: '#0a7ea4',
     textAlign: 'center',
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 24,
+    fontWeight: 'bold',
   },
 });
