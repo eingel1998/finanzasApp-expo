@@ -11,7 +11,8 @@ import { useEffect } from 'react';
 
 // Componente interno que maneja la navegación basada en el estado de autenticación
 function RootLayoutNav() {
-  const { user, isLoading } = useAuth();
+  // Usamos _user para indicar que la variable es intencional pero no se usa actualmente
+  const { user: _user, isLoading } = useAuth();
   const colorScheme = useColorScheme();
 
   if (isLoading) {
