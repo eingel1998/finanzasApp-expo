@@ -24,9 +24,8 @@ export default function ProfileScreen() {
   };
 
   const navigateToRegister = () => {
-    // Asumiendo que tienes una ruta /auth/register o similar
-    // router.push('/auth/register'); 
-    console.log("Navegar a la pantalla de registro"); // Placeholder si no existe la ruta
+    // Navega a /auth/login y pasa un parámetro para abrir el modo registro
+    router.push({ pathname: '/auth/login', params: { mode: 'register' } });
   };
 
   if (isLoading) {

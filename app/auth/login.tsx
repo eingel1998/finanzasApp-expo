@@ -2,13 +2,15 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/Theme';
 import { useAuth } from '@/context/AuthContext';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function LoginScreen() {
+  const params = useLocalSearchParams();
   const { login, register } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  // Si viene ?mode=register, mostrar el formulario de registro
+  const [isLogin, setIsLogin] = useState(params.mode !== 'register');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
