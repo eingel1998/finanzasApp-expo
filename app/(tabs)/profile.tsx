@@ -2,7 +2,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 
 export default function ProfileScreen() {
   return (
@@ -39,7 +39,9 @@ export default function ProfileScreen() {
         </ThemedView>
 
         <ThemedView style={styles.buttonContainer}>
-          <ThemedText style={styles.buttonPlaceholder}>Cerrar Sesión</ThemedText>
+          <Pressable style={({ pressed }) => [styles.buttonPlaceholder, pressed && { opacity: 0.8 }]} onPress={() => { /* TODO: Implement logout logic */ }}>
+            <ThemedText style={{ color: '#E04343', textAlign: 'center', fontWeight: 'bold' }}>Cerrar Sesión</ThemedText>
+          </Pressable>
         </ThemedView>
       </ThemedView>
     </ParallaxScrollView>

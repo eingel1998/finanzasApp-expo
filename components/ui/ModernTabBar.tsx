@@ -141,8 +141,6 @@ const styles = StyleSheet.create({
   container: {
     height: 70,
     flexDirection: 'row',
-    borderTopLeftRadius: BorderRadius.lg,
-    borderTopRightRadius: BorderRadius.lg,
     overflow: 'hidden',
     ...Shadows.light.medium,
     paddingBottom: Spacing.sm, // Añadir espaciado inferior
