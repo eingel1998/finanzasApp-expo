@@ -1,166 +1,157 @@
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import { Colors } from '@/constants/Theme'; // Importar Colors
-import { useAuth } from '@/context/AuthContext';
-import { router } from 'expo-router';
-import { Alert, Pressable, StyleSheet } from 'react-native';
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { SettingsItem } from "@/components/ui/SettingsItem";
+import { SettingsSection } from "@/components/ui/SettingsSection";
+import { BorderRadius, Colors, Spacing } from "@/constants/Theme";
+import { useAuth } from "@/context/AuthContext";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { useRouter } from "expo-router";
+import React from "react";
+import { ActivityIndicator, Appearance, Image, Pressable, StyleSheet, Switch, View } from "react-native";
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuth();
+  const { user, isLoading, logout } = useAuth();
+  const router = useRouter();
+  const colorScheme = useColorScheme() ?? 'light';
+  const isDark = colorScheme === 'dark';
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      Alert.alert('Sesión cerrada', 'Has cerrado sesión correctamente');
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-      Alert.alert('Error', 'No se pudo cerrar la sesión');
-    }
+  const handleSetColorScheme = (value: boolean) => {
+    Appearance.setColorScheme(value ? 'dark' : 'light');
   };
 
-  const handleLogin = () => {
+  const navigateToLogin = () => {
     router.push('/auth/login');
   };
 
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#B0C4E0', dark: '#2A2A4A' }}
-      headerImage={<IconSymbol size={120} name="person.fill" color="#FFFFFF" style={styles.headerIcon} />}
-    >
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">Perfil</ThemedText>
-        
-        {user ? (
-          // Usuario autenticado - Mostrar información del perfil
-          <>
-            <ThemedView style={styles.profileCard}>
-              <ThemedText type="subtitle">Información Personal</ThemedText>
-              <ThemedText>Nombre: {user.name}</ThemedText>
-              <ThemedText>Correo: {user.email}</ThemedText>
-            </ThemedView>
+  const navigateToRegister = () => {
+    // Asumiendo que tienes una ruta /auth/register o similar
+    // router.push('/auth/register'); 
+    console.log("Navegar a la pantalla de registro"); // Placeholder si no existe la ruta
+  };
 
-            <ThemedView style={styles.section}>
-              <ThemedText type="subtitle">Preferencias</ThemedText>
-              <ThemedText style={styles.settingLabel}>Tema</ThemedText>
-              {/* Aquí irá el selector de tema (claro/oscuro) */}
-              
-              <ThemedText style={styles.settingLabel}>Moneda</ThemedText>
-              {/* Aquí irá el selector de moneda */}
-              
-              <ThemedText style={styles.settingLabel}>Notificaciones</ThemedText>
-              {/* Aquí irán las opciones de notificaciones */}
-            </ThemedView>
-
-            <ThemedView style={styles.section}>
-              <ThemedText type="subtitle">Estadísticas</ThemedText>
-              <ThemedText>Transacciones registradas: 0</ThemedText>
-              <ThemedText>Presupuestos activos: 0</ThemedText>
-              <ThemedText>Metas de ahorro: 0</ThemedText>
-            </ThemedView>
-
-            <ThemedView style={styles.buttonContainer}>
-              <Pressable 
-                style={({ pressed }) => [styles.logoutButton, pressed && { opacity: 0.8 }]} 
-                onPress={handleLogout}
-              >
-                <ThemedText style={styles.logoutButtonText}>Cerrar Sesión</ThemedText>
-              </Pressable>
-            </ThemedView>
-          </>
-        ) : (
-          // Usuario no autenticado - Mostrar mensaje y botón de inicio de sesión
-          <ThemedView style={styles.notAuthenticatedContainer}>
-            <ThemedText style={styles.notAuthenticatedText}>
-              Inicia sesión para sincronizar tus datos y acceder a todas las funcionalidades
-            </ThemedText>
-            
-            <Pressable 
-              style={({ pressed }) => [styles.loginButton, pressed && { opacity: 0.8 }]} 
-              onPress={handleLogin}
-            >
-              <ThemedText style={styles.loginButtonText}>Iniciar Sesión / Registrarse</ThemedText>
-            </Pressable>
-            
-            <ThemedText style={styles.infoText}>
-              Puedes seguir usando la aplicación sin iniciar sesión, pero tus datos solo se guardarán en este dispositivo.
-            </ThemedText>
-          </ThemedView>
-        )}
+  if (isLoading) {
+    return (
+      <ThemedView style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color={Colors.primary[colorScheme]} />
       </ThemedView>
-    </ParallaxScrollView>
+    );
+  }
+
+  return (
+    <ThemedView style={styles.container}>
+      <SettingsSection title="Cuenta">
+        {user ? (
+          <View style={styles.userContainer}>
+            {/* Placeholder para la imagen de perfil */}
+            <Image 
+              source={{ uri: user.avatar || 'https://via.placeholder.com/80' }} // Corregido a user.avatar
+              style={styles.profileImage} 
+            />
+            <View style={styles.userInfo}>
+              <ThemedText style={styles.userName}>{user.name}</ThemedText>
+              <ThemedText style={styles.userEmail}>{user.email}</ThemedText>
+            </View>
+            <Pressable onPress={logout} style={styles.button}>
+              <ThemedText style={styles.buttonText}>Cerrar Sesión</ThemedText>
+            </Pressable>
+          </View>
+        ) : (
+          <View style={styles.authActions}>
+            <Pressable onPress={navigateToLogin} style={styles.button}>
+              <ThemedText style={styles.buttonText}>Iniciar Sesión</ThemedText>
+            </Pressable>
+            <Pressable onPress={navigateToRegister} style={[styles.button, styles.secondaryButton]}>
+              <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>Crear Cuenta</ThemedText>
+            </Pressable>
+          </View>
+        )}
+      </SettingsSection>
+
+      <SettingsSection title="Preferencias">
+        <SettingsItem
+          icon={isDark ? "moon.fill" : "sun.max.fill"}
+          title="Tema Oscuro"
+          rightElement={
+            <Switch
+              value={isDark}
+              onValueChange={handleSetColorScheme}
+              trackColor={{ false: Colors.border.light, true: Colors.primary[colorScheme] }}
+              thumbColor={isDark ? Colors.background.light : Colors.background.dark}
+            />
+          }
+        />
+        {/* Aquí se pueden agregar más SettingsItem para futuras configuraciones */}
+      </SettingsSection>
+      
+      <SettingsSection title="Información">
+        {/* <SettingsItem icon="info.circle.fill" title="Acerca de FinanzasApp" onPress={() => router.push('/profile/about')} /> */}
+        {/* <SettingsItem icon="shield.lefthalf.filled" title="Política de Privacidad" onPress={() => router.push('/profile/privacy')} /> */}
+        {/* <SettingsItem icon="doc.text.fill" title="Términos de Servicio" onPress={() => router.push('/profile/terms')} /> */}
+        <SettingsItem icon="info.circle.fill" title="Acerca de FinanzasApp" onPress={() => console.log('Navegar a Acerca de')}/>
+        <SettingsItem icon="shield.lefthalf.filled" title="Política de Privacidad" onPress={() => console.log('Navegar a Política de Privacidad')}/>
+        <SettingsItem icon="doc.text.fill" title="Términos de Servicio" onPress={() => console.log('Navegar a Términos de Servicio')}/>
+      </SettingsSection>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: Spacing.md,
   },
-  headerIcon: {
-    opacity: 0.8,
-    alignSelf: 'center',
+  centered: {
+    alignItems: "center",
+    justifyContent: "center",
   },
-  profileCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 16,
-  },
-  section: {
-    marginVertical: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 16,
-  },
-  settingLabel: {
-    fontWeight: 'bold',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  buttonContainer: {
-    marginTop: 24,
-  },
-  logoutButton: {
-    backgroundColor: 'rgba(224, 67, 67, 0.2)',
-    padding: 16,
-    borderRadius: 8,
+  userContainer: {
     alignItems: 'center',
+    marginBottom: Spacing.lg,
   },
-  logoutButtonText: {
-    color: '#E04343',
-    fontWeight: 'bold',
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: Spacing.md,
+    backgroundColor: Colors.border.light, // Color de fondo mientras carga la imagen
   },
-  notAuthenticatedContainer: {
-    marginVertical: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 20,
+  userInfo: {
     alignItems: 'center',
+    marginBottom: Spacing.md,
   },
-  notAuthenticatedText: {
+  userName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: Spacing.xs,
+  },
+  userEmail: {
     fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
+    color: Colors.text.secondaryLight, // Ajustar según el tema si es necesario
   },
-  loginButton: {
-    backgroundColor: Colors.primary.light, // Uso de Colors
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+  authActions: {
     alignItems: 'center',
-    width: '100%',
-    marginBottom: 16,
+    marginBottom: Spacing.lg,
   },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+  button: {
+    backgroundColor: Colors.primary.light, // Ajustar según el tema
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.md,
+    marginVertical: Spacing.xs,
+    width: '80%',
+    alignItems: 'center',
+  },
+  secondaryButton: {
+    backgroundColor: Colors.background.light, // Ajustar según el tema
+    borderColor: Colors.primary.light, // Ajustar según el tema
+    borderWidth: 1,
+  },
+  buttonText: {
+    color: Colors.background.light, // Ajustar según el tema
     fontSize: 16,
+    fontWeight: '600',
   },
-  infoText: {
-    fontSize: 14,
-    textAlign: 'center',
-    opacity: 0.7,
+  secondaryButtonText: {
+    color: Colors.primary.light, // Ajustar según el tema
   },
 });

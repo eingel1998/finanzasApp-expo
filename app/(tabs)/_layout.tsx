@@ -5,15 +5,13 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ModernTabBar } from '@/components/ui/ModernTabBar';
 
 export default function TabLayout() {
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         // Ocultamos la barra de pestañas predeterminada ya que usaremos nuestro componente personalizado
         tabBarStyle: { display: 'none' },
-      }}
-      // Usamos nuestro componente ModernTabBar personalizado
+      }}      // Usamos nuestro componente ModernTabBar personalizado
       tabBar={props => <ModernTabBar {...props} />}
     >
       <Tabs.Screen
@@ -44,7 +42,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="banknote" color={color} />,
         }}
       />
-
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Configuración',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }
