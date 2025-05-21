@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
-import React, { useEffect } from 'react';
-import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { LayoutChangeEvent, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -12,8 +12,6 @@ import { BorderRadius, Colors, Shadows, Spacing, Typography } from '@/constants/
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { IconSymbol, IconSymbolName } from './IconSymbol';
 
-const { width } = Dimensions.get('window');
-
 
 
 type ModernTabBarProps = {
@@ -22,35 +20,54 @@ type ModernTabBarProps = {
   navigation: any;
 };
 
+type TabLayout = {
+  x: number;
+  width: number;
+};
+
 export function ModernTabBar({ state, descriptors, navigation }: ModernTabBarProps) {
   const colorScheme = useColorScheme() || 'light';
   const isDark = colorScheme === 'dark';
-  
-  // Valores para animaciones
-  const tabPosition = useSharedValue(0);
-  
-  
+
+  const [tabLayouts, setTabLayouts] = useState<TabLayout[]>([]);
+  const tabPositionX = useSharedValue(0);
+  const tabWidthValue = useSharedValue(0);
+
   // Definir colores basados en el tema
   const primaryColor = isDark ? Colors.primary.dark : Colors.primary.light;
   const secondaryTextColor = isDark ? Colors.text.secondaryDark : Colors.text.secondaryLight;
 
-  // Actualizar la posición del indicador cuando cambia la pestaña activa
+  // Actualizar la posición del indicador cuando cambia la pestaña activa o las mediciones
   useEffect(() => {
-    const tabWidth = width / state.routes.length;
-    tabPosition.value = withSpring(state.index * tabWidth, {
-      damping: 15,
-      stiffness: 120,
-    });
-  }, [state.index, state.routes.length, tabPosition]);
+    if (tabLayouts[state.index]) {
+      const { x, width: currentTabWidth } = tabLayouts[state.index];
+      tabPositionX.value = withSpring(x, {
+        damping: 15,
+        stiffness: 120,
+      });
+      tabWidthValue.value = withSpring(currentTabWidth, {
+        damping: 15,
+        stiffness: 120,
+      });
+    }
+  }, [state.index, tabLayouts, tabPositionX, tabWidthValue]);
 
   // Estilo animado para el indicador de pestaña activa
   const indicatorStyle = useAnimatedStyle(() => {
-    const tabWidth = width / state.routes.length;
     return {
-      transform: [{ translateX: tabPosition.value }],
-      width: tabWidth,
+      transform: [{ translateX: tabPositionX.value }],
+      width: tabWidthValue.value,
     };
   });
+
+  const handleTabLayout = (event: LayoutChangeEvent, index: number) => {
+    const { x, width } = event.nativeEvent.layout;
+    setTabLayouts(prevLayouts => {
+      const newLayouts = [...prevLayouts];
+      newLayouts[index] = { x, width };
+      return newLayouts;
+    });
+  };
 
   return (
     <View style={[styles.container, isDark ? styles.containerDark : styles.containerLight]}>
@@ -61,11 +78,6 @@ export function ModernTabBar({ state, descriptors, navigation }: ModernTabBarPro
       <View style={styles.tabsContainer}>
         {state.routes.map((route: any, index: number) => {
           const { options } = descriptors[route.key];
-          // Acortar la etiqueta para 'transactions' si no hay un título definido
-          let label = options.title || route.name;
-          if (route.name === 'transactions' && !options.title) {
-            label = 'Transacciones'; // O un nombre más corto como 'Movimientos'
-          }
           const isFocused = state.index === index;
           
           // Determinar el color del ícono basado en el estado y el tema
@@ -75,7 +87,7 @@ export function ModernTabBar({ state, descriptors, navigation }: ModernTabBarPro
           let iconName: IconSymbolName | '' = '';
           switch (route.name) {
             case 'index':
-              iconName = 'chart.pie.fill';
+              iconName = 'plus.circle.fill';
               break;
             case 'transactions':
               iconName = 'arrow.left.arrow.right';
@@ -88,6 +100,9 @@ export function ModernTabBar({ state, descriptors, navigation }: ModernTabBarPro
               break;
             case 'profile':
               iconName = 'person.fill';
+              break;
+            case 'dashboard':
+              iconName = 'chart.pie.fill';
               break;
             default:
               iconName = 'questionmark.circle';
@@ -117,6 +132,7 @@ export function ModernTabBar({ state, descriptors, navigation }: ModernTabBarPro
               accessibilityState={isFocused ? { selected: true } : {}}
               accessibilityLabel={options.tabBarAccessibilityLabel}
               onPress={onPress}
+              onLayout={(event) => handleTabLayout(event, index)} // Added onLayout
               style={styles.tab}
             >
               <View style={[
@@ -127,7 +143,6 @@ export function ModernTabBar({ state, descriptors, navigation }: ModernTabBarPro
                   size={isFocused ? 28 : 24} 
                   color={iconColor} 
                 />
-
               </View>
             </Pressable>
           );
@@ -147,13 +162,13 @@ const styles = StyleSheet.create({
   },
   containerLight: {
     backgroundColor: Colors.background.light,
-    borderTopColor: Colors.border.light,
-    borderTopWidth: 1,
+    // borderTopColor: Colors.border.light, // Eliminado para quitar la línea gris
+    // borderTopWidth: 1, // Eliminado para quitar la línea gris
   },
   containerDark: {
     backgroundColor: Colors.background.dark,
-    borderTopColor: Colors.border.dark,
-    borderTopWidth: 1,
+    // borderTopColor: Colors.border.dark, // Eliminado para quitar la línea en modo oscuro
+    // borderTopWidth: 0, // Eliminado para quitar la línea en modo oscuro
   },
   indicator: {
     position: 'absolute',
